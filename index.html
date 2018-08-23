@@ -2,51 +2,44 @@
 <html lang="en">
     <head>
        <meta charset="UTF-8">
-       <title>Hello World</title>
+       <title>Draw on Canvas</title>
        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
+       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" type="text/css">
+       <link rel="stylesheet" href="./dist/css/main.css" type="text/css">
+      <meta http-equiv="Cache-control" content="no-cache">
+      </head>
     <body>
+      <div class="wrapper">
 
-      <canvas id="canvas" height="600px" width="800px"></canvas>
-      <button id="drawRect">Draw</button>
-      <script>
-      
-        var btn = document.getElementById('drawRect');
-        btn.addEventListener('click' , function(){
+        <nav>
+          <ul>
+            
+            <li id="trackX"></li>
 
-        //math.random generates a random number between 0 and 1.  Essentially creating a percentage of 
-        //you are multiplying.
-
-        function randColor(){
-          return '#' + Math.floor(Math.random()*16777215).toString(16);
-        }
-
+            <li id="trackY"></li>
+            
+            <li>
+              <button id="btnRect">Rectangle</button>
+            </li>
+          
+            <li>
+              <button id="btnLine">Line</button>
+            </li>
+            
+            <li>
+              <button id="btnCircle">Circle</button>
+            </li>
+            
+            <li>
+              <button id="btnPath">Path</button>
+            </li>
+          </ul>
         
-        var rx = Math.random() * 400;
-        var ry = Math.random() * 300;
-
-        var x = Math.random() * (800-rx);
-        var y = Math.random() * (600-ry);
-
-        var radius = Math.random() * (300);
-  
-        var cx = Math.random() * (800 - radius * 2);
-        var cy = Math.random() * (600 -radius * 2);
-
+        </nav>
         
-        var canvas = document.getElementById('canvas');
-        var ctx = canvas.getContext('2d');
-        ctx.fillStyle = randColor();
-        ctx.fillRect(x, y, rx, ry);
-
-
-        //circle
-        ctx.beginPath();
-        ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
-        ctx.stroke();
-
-
-      });
-      </script>
+        <main></main>
+        
+      </div>
+      <script src="./dist/js/main.js"></script>  
     </body>
 </html>
