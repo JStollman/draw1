@@ -180,7 +180,7 @@ var draw = (function(){
             ctx.save();
         },
 
-        //Draw a triangle
+        //Draw a 3 point triangle with 3 mouse clicks
         draw3Point: function(){
 
             ctx.fillStyle = this.getFillColor();
@@ -269,7 +269,7 @@ var draw = (function(){
 
         },
 
-        //Draw a rectange
+        //Draw a rectangle
         drawRect: function(){
             ctx.fillStyle = this.getFillColor();
             ctx.strokeStyle = this.getStrokeColor();
@@ -326,6 +326,9 @@ draw.getCanvas().addEventListener('mousedown', function(){
         draw.setStart();
         draw.setIsDrawing(true);
     }
+    if(draw.getShape()==='3-point'){
+        draw.setPoint();
+    }
 });
 
 //Get the ending position
@@ -335,11 +338,6 @@ draw.getCanvas().addEventListener('mouseup', function(){
         draw.setEnd();
         draw.draw();
         draw.setIsDrawing(false);
-    }
-
-
-    if(draw.getShape()==='3-point'){
-        draw.setPoint();
     }
 });
 
