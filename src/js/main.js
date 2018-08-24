@@ -43,8 +43,8 @@ var draw = (function(){
     //fill color
     var fill='';
 
-    //3 click variables
-    varclicks = [];
+    //3 point variables
+    var points = [];
     var i = 0;
 
     return {
@@ -116,17 +116,17 @@ var draw = (function(){
             y2=y;
         },
 
-        //Draw a three click triangle
+        //Draw a three point triangle
         setPoint: function(){
 
-           clicks[i]=[];
-           clicks[i]['x']=x;
-           clicks[i]['y']=y;
+           points[i]=[];
+           points[i]['x']=x;
+           points[i]['y']=y;
 
             if(points.length>2){
                 this.draw();
                 i=0;
-               clicks=[];
+                points=[];
             }else{
                 i++;
             }
@@ -167,7 +167,7 @@ var draw = (function(){
                 case 'path':
                     this.drawPath();
                     break;
-                case '3-click':
+                case '3-point':
                     this.draw3Point();;
                     break;
                 case 'triangle':
@@ -180,7 +180,7 @@ var draw = (function(){
             ctx.save();
         },
 
-        //Draw a 3 click triangle with 3 mouse clicks
+        //Draw a 3 point triangle with 3 mouse points
         draw3Point: function(){
 
             ctx.fillStyle = this.getFillColor();
@@ -188,10 +188,10 @@ var draw = (function(){
 
             ctx.beginPath();
 
-            ctx.moveTo(points[0]['x'],clicks[0]['y']);
-            ctx.lineTo(points[1]['x'],clicks[1]['y']);
-            ctx.lineTo(points[2]['x'],clicks[2]['y']);
-            ctx.lineTo(points[0]['x'],clicks[0]['y']);
+            ctx.moveTo(points[0]['x'],points[0]['y']);
+            ctx.lineTo(points[1]['x'],points[1]['y']);
+            ctx.lineTo(points[2]['x'],points[2]['y']);
+            ctx.lineTo(points[0]['x'],points[0]['y']);
 
             ctx.stroke();
             ctx.fill();
@@ -234,10 +234,10 @@ var draw = (function(){
         drawTriangle: function(){
 
             //x1,y1 to x2,y2 is the first line
-            //we will use the first click +/- 
+            //we will use the first point +/- 
             //(depending on the direction of
             //the mouse movement) the result of 
-            //PT to add a third click. 
+            //PT to add a third point. 
             var a = (x1-x2);
             var b = (y1-y2);
             var c = Math.sqrt(a*a + b*b);
@@ -315,18 +315,18 @@ document.getElementById('btnLine').addEventListener('click',function(){
     draw.setShape('line');
 });
 
-//Draw a three click triangle
+//Draw a three point triangle
 document.getElementById('btn3Point').addEventListener('click', function(){
-    draw.setShape('3-click');
+    draw.setShape('3-point');
 });
 
 //Get the starting position
 draw.getCanvas().addEventListener('mousedown', function(){
-    if(draw.getShape()!=='3-click'){
+    if(draw.getShape()!=='3-point'){
         draw.setStart();
         draw.setIsDrawing(true);
     }
-    if(draw.getShape()==='3-click'){
+    if(draw.getShape()==='3-point'){
         draw.setPoint();
     }
 });
@@ -334,7 +334,7 @@ draw.getCanvas().addEventListener('mousedown', function(){
 //Get the ending position
 draw.getCanvas().addEventListener('mouseup', function(){
 
-    if(draw.getShape()!=='3-click'){
+    if(draw.getShape()!=='3-point'){
         draw.setEnd();
         draw.draw();
         draw.setIsDrawing(false);
