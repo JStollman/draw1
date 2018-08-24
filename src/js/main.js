@@ -47,6 +47,9 @@ var draw = (function(){
     var points = [];
     var i = 0;
 
+    //Tracking
+    var stack=[];
+
     return {
 
         //Set isDrawing
@@ -178,6 +181,8 @@ var draw = (function(){
                     break;
             }
             ctx.save();
+
+            //console.log(stack);
         },
 
         //Draw a rectangle
@@ -185,7 +190,22 @@ var draw = (function(){
             ctx.fillStyle = this.getFillColor();
             ctx.strokeStyle = this.getStrokeColor();
             ctx.fillRect(x1,y1, (x2-x1),(y2-y1));
+        
+            stack.push({
+                shape: 'rectangle',
+                cords: {
+                    x1: x1,
+                    y1: y1,
+                    x2: x2,
+                    y2: y2,
+                },
+                styles: {
+                    stroke: ctx.strokeStyle,
+                    fill: ctx.fillStyle
+                }
+            });
         },
+
 
         //Draw Line
         drawLine: function(){
@@ -194,6 +214,19 @@ var draw = (function(){
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
             ctx.stroke();
+
+            stack.push({
+                shape: 'line',
+                cords: {
+                    x1: x1,
+                    y1: y1,
+                    x2: x2,
+                    y2: y2,
+                },
+                styles: {
+                    stroke: ctx.strokeStyle
+                }
+            });
         },
 
         //Draw Circle
@@ -209,6 +242,20 @@ var draw = (function(){
             ctx.arc(x1, y1, radius, 0, 2*Math.PI);
             ctx.stroke();
             ctx.fill();
+
+            stack.push({
+                shape: 'circle',
+                cords: {
+                    x1: x1,
+                    y1: y1,
+                    x2: x2,
+                    y2: y2,
+                },
+                styles: {
+                    stroke: ctx.strokeStyle,
+                    fill: ctx.fillStyle
+                }
+            });
         },
 
         //Draw Path
@@ -218,6 +265,20 @@ var draw = (function(){
             ctx.moveTo(lx, ly);
             ctx.lineTo(x, y);
             ctx.stroke();
+
+            stack.push({
+                shape: 'path',
+                cords: {
+                    lx: lx,
+                    ly: ly,
+                    x: x,
+                    y: y
+                },
+                styles: {
+                    stroke: ctx.strokeStyle
+                }
+            });
+
         },
 
 
@@ -258,6 +319,20 @@ var draw = (function(){
             ctx.stroke();
             ctx.fill();
 
+            stack.push({
+                shape: 'triangle',
+                cords: {
+                    x1: x1,
+                    y1: y1,
+                    x2: x2,
+                    y2: y2,
+                },
+                styles: {
+                    stroke: ctx.strokeStyle,
+                    fill: ctx.fillStyle
+                }
+            });
+
         },
 
         //Draw a 3 point triangle with 3 mouse points
@@ -275,8 +350,64 @@ var draw = (function(){
 
             ctx.stroke();
             ctx.fill();
+
+            stack.push({
+                shape: '3-point',
+                cords: {
+                    points: points
+                },
+                styles: {
+                    stroke: ctx.strokeStyle,
+                    fill: ctx.fillStyle
+                }
+            });
         },
 
+        clear: function(){
+            canvas.width = canvas.width;
+        },
+
+        redraw: function(){
+            
+            for(item in stack){
+                var shp = stack[item].shape;
+                var itm = stack[item];
+                switch(shp){
+
+                    case 'path':
+                        shape = stack[item].shape;
+                        lx = itm.cords.lx; 
+                        ly = itm.cords.ly;
+                        x = itm.cords.x;
+                        y =itm.cords.y;
+                        ctx.strokeStyle = itm.styles.stroke;
+                        break;
+
+                    case 'circle':
+                    case 'line':
+                    case 'rectangle':
+                    case 'triangle':
+                        shape = stack[item].shape;
+                        x1 = itm.cords.x1; 
+                        y1 = itm.cords.y1;
+                        x2 = itm.cords.x2;
+                        y2 =itm.cords.y2;
+                        ctx.fillStyle = itm.styles.fill;
+                        ctx.strokeStyle = itm.styles.stroke;
+
+                        break;
+
+                    case '3-point':
+                        shape = stack[item].shape;
+                        points = itm.cords.points; 
+                        ctx.strokeStyle = itm.styles.stroke;
+                        ctx.fillStyle = itm.styles.fill;
+                        break;
+                }
+
+                this.draw();
+            }
+        },
 
         getCanvas: function(){
             return canvas;
@@ -322,6 +453,20 @@ document.getElementById('btnTriangle').addEventListener('click',function(){
 //Draw a three point triangle
 document.getElementById('btn3Point').addEventListener('click', function(){
     draw.setShape('3-point');
+});
+
+//Clear the Canvas
+document.getElementById('btnClear').addEventListener('click', function(){
+    if(confirm('Are you sure you want to clear the canvas?')){
+        draw.clear();
+    }
+});
+
+//Redraw the canvas
+document.getElementById('btnRedraw').addEventListener('click', function(){
+    if(confirm('Are you sure you want to redraw the canvas?')){
+        draw.redraw();
+    }
 });
 
 //Get the starting position
