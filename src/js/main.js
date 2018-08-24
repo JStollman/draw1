@@ -41,6 +41,21 @@ var draw = (function() {
 
     //Do we want to draw?
     var isDrawing=false;
+
+    //stroke color
+    var stroke='';
+
+
+    //fill color
+    var fill='';
+
+    //3 point variables
+    var points = [];
+    var i = 0;
+
+    
+    //Tracking
+    var stack = [];
     
   
     return {
@@ -70,6 +85,36 @@ var draw = (function() {
         randColor: function(){
             return '#' + Math.floor(Math.random()*16777215).toString(16);
         },
+
+        //A setter for stroke color
+        setStrokeColor: function(color){
+          stroke = color;
+        },
+
+        //A setter for fill color
+        setFillColor: function(color){
+            fill= color;
+        },
+
+        // A getter for stroke color
+        getStrokeColor: function(){
+
+          if(stroke.length > 0){
+              return stroke;
+          }
+              
+          return this.randColor();
+      },
+
+      // A getter for fill color
+      getFillColor: function(){
+
+          if(fill.length > 0){
+              return fill;
+          }
+              
+          return this.randColor();
+      },
 
         //set starting x,y (mouse down)
         setStart: function(){
@@ -101,6 +146,26 @@ var draw = (function() {
         document.getElementById('trackX').innerHTML = 'X: ' + x;
         document.getElementById('trackY').innerHTML = 'Y: ' + y;
       },
+
+       //Draw a 3 point triangle
+       setPoint: function(){
+
+        points[i]=[];
+        points[i]['x']=x;
+        points[i]['y']=y;
+
+        if(points.length>2){
+            this.draw();
+            console.log(points);
+            i=0;
+            points = [];
+        }else{
+            i++;
+        }
+
+    },
+
+
   
       //Draw a shape
       draw: function(){
@@ -118,37 +183,50 @@ var draw = (function() {
             case 'path':
                 this.drawPath();
                 break;
+            case 'triangle':
+                this.drawTriangle();
+                break;
+            case '3-point':
+                this.draw3Point();
+                break;
             default:
                 alert('Please choose a shape');
                 break;
         }
         ctx.save();
+        console.log(stack);
+      },
+
+        
+      //Draw a rectangle
+      drawRect: function() {
+      //Draw some sample rectsangles
+      ctx.fillStyle = this.randColor();
+      ctx.strokeStyle = this.randColor();
+      ctx.fillRect(x1, y1, (x2-x1),y2-y1);
+      },
+  
+      //Draw a line
+      drawLine: function() {
+        //Start by using random fill colors.
+        ctx.strokeStyle = this.randColor();
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
       },
 
         //Draw a Circle
         drawCircle: function() {
           ctx.strokeStyle = this.randColor();
           ctx.fillStyle = this.randColor();
-          
           var a = (x1-x2);
           var b = (y1-y2);
           var radius = Math.sqrt(a*a + b*b);
-          
           ctx.beginPath();
           ctx.arc(x1, y1, radius, 0, 2*Math.PI);
-      
           ctx.stroke();
           ctx.fill();
-        },
-
-        //Draw a line
-        drawLine: function() {
-          //Start by using random fill colors.
-          ctx.strokeStyle = this.randColor();
-          ctx.beginPath();
-          ctx.moveTo(x1, y1);
-          ctx.lineTo(x2, y2);
-          ctx.stroke();
         },
 
         //Draw a path
@@ -161,15 +239,79 @@ var draw = (function() {
           ctx.stroke();
         },
 
-        //Draw a rectangle
-        drawRect: function() {
-        //Draw some sample rectsangles
-        ctx.fillStyle = this.randColor();
-        ctx.fillRect(x1, y1, (x2-x1),y2-y1);
-      },
-  
+
       getCanvas: function(){
         return canvas;
+      },
+
+
+        //Draw a Triangle
+        drawTriangle: function(){
+          var a = (x1-x2);
+          var b = (y1-y2);
+          var c = Math.sqrt(a*a + b*b);
+          var d = x1+c;
+          var e = y1+c;
+
+          //Drag left to right
+          if(x1>x2){
+              d=x1-c;
+          }
+
+          //Drag up
+          if(y1>y2){
+              e=y1-c;
+          }
+      
+          ctx.fillStyle = this.getFillColor();
+          ctx.strokeStyle = this.getStrokeColor();
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+
+          ctx.lineTo(d,e);
+          ctx.lineTo(x2, y2);
+
+          ctx.lineTo(x1, y1);
+          ctx.stroke();
+          ctx.fill();
+      },
+
+        //Draw 3 point
+        draw3Point: function(){
+          ctx.strokeStyle = this.getStrokeColor();
+          ctx.fillStyle = this.getFillColor();
+          
+          ctx.beginPath();
+          
+          ctx.moveTo(points[0]['x'], points[0]['y']);
+          ctx.lineTo(points[1]['x'], points[1]['y']);
+          ctx.lineTo(points[2]['x'], points[2]['y']);
+          ctx.lineTo(points[0]['x'], points[0]['y']);
+          ctx.stroke();
+          ctx.fill()
+          stack.push({
+              'shape' : '3-point',
+              'cords' : {
+                  'points':points
+              },
+              'styles':{
+                  'stroke': ctx.strokeStyle,
+                  'fill': ctx.fillStyle
+              }
+          });
+      },
+
+
+      //Clear
+      Clear: function(){
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      },
+          
+      //Redraw
+      Redraw: function(){
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
       },
   
       //Initialize the object, this must be called before anything else
@@ -190,18 +332,52 @@ var draw = (function() {
     draw.setShape('rectangle');
   });
   
+  document.getElementById('btnCircle').addEventListener('click',function(){
+    draw.setShape('circle');
+  });
 
   document.getElementById('btnLine').addEventListener('click',function(){
     draw.setShape('line');
   });
  
-  document.getElementById('btnCircle').addEventListener('click',function(){
-    draw.setShape('circle');
-  });
   
   document.getElementById('btnPath').addEventListener('click',function(){
     draw.setShape('path');
   });
+
+  document.getElementById('btnTriangle').addEventListener('click', function(){
+    draw.setShape('triangle');
+  });
+  
+  document.getElementById('btn3Point').addEventListener('click', function(){
+      draw.setShape('3-point');
+  });
+
+  document.getElementById('btnClear').addEventListener('click', function(){
+    draw.Clear();
+  });
+
+document.getElementById('btnRedraw').addEventListener('click', function(){
+    draw.Redraw();
+});
+
+
+document.getElementById('strokeColor').addEventListener('change', function(){
+    draw.setStrokeColor(document.getElementById('strokeColor').value);    
+});
+
+document.getElementById('randStrokeColor').addEventListener('change', function(){
+    draw.setStart('');
+});
+
+
+document.getElementById('fillColor').addEventListener('change', function(){
+    draw.setFillColor(document.getElementById('fillColor').value);
+});   
+
+document.getElementById('randFillColor').addEventListener('change', function(){
+    draw.setStart('');
+});
 
   //Add a mousemove listener to the canvas
   //When the mouse reports a change of position use the event data to
@@ -213,7 +389,7 @@ var draw = (function() {
     draw.setIsDrawing(true);
   });
   
-  //Get the endingposition
+  //Get the ending position
   draw.getCanvas().addEventListener('mouseup', function() {
     draw.setEnd();
     draw.draw();
@@ -228,6 +404,27 @@ var draw = (function() {
     if(draw.getShape()==='path'&& draw.getIsDrawing()===true){
       draw.draw();
     }
+
+    draw.getCanvas().addEventListener('mousedown' , function(){
+      if(draw.getShape()!=='3-Point'){
+      draw.setStart();
+      draw.setIsDrawing(true);
+      }
+  });
+  
+  draw.getCanvas().addEventListener('mouseup' , function(){
+      if(draw.getShape()!=='3-Point'){
+      draw.setEnd();
+      draw.draw();
+      draw.setIsDrawing(false);
+      }
+  });
+  
+  draw.getCanvas().addEventListener('mouseup' , function(){
+      if(draw.getShape()!=='3-Point'){
+      draw.setPoint();
+      }
+  });
 
   });
   
