@@ -167,11 +167,11 @@ var draw = (function(){
                 case 'path':
                     this.drawPath();
                     break;
-                case '3-point':
-                    this.draw3Point();;
-                    break;
                 case 'triangle':
                     this.drawTriangle();
+                    break; 
+                case '3-point':
+                    this.draw3Point();;
                     break;
                 default:
                     alert('Please choose a shape');
@@ -180,29 +180,19 @@ var draw = (function(){
             ctx.save();
         },
 
-        //Draw a 3 point triangle with 3 mouse points
-        draw3Point: function(){
-
+        //Draw a rectangle
+        drawRect: function(){
             ctx.fillStyle = this.getFillColor();
             ctx.strokeStyle = this.getStrokeColor();
-
-            ctx.beginPath();
-
-            ctx.moveTo(points[0]['x'],points[0]['y']);
-            ctx.lineTo(points[1]['x'],points[1]['y']);
-            ctx.lineTo(points[2]['x'],points[2]['y']);
-            ctx.lineTo(points[0]['x'],points[0]['y']);
-
-            ctx.stroke();
-            ctx.fill();
+            ctx.fillRect(x1,y1, (x2-x1),(y2-y1));
         },
 
-        //Draw Path
-        drawPath: function(){
+        //Draw Line
+        drawLine: function(){
             ctx.strokeStyle = this.getStrokeColor();
             ctx.beginPath();
-            ctx.moveTo(lx, ly);
-            ctx.lineTo(x, y);
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
             ctx.stroke();
         },
 
@@ -221,14 +211,15 @@ var draw = (function(){
             ctx.fill();
         },
 
-        //Draw Line
-        drawLine: function(){
+        //Draw Path
+        drawPath: function(){
             ctx.strokeStyle = this.getStrokeColor();
             ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
+            ctx.moveTo(lx, ly);
+            ctx.lineTo(x, y);
             ctx.stroke();
         },
+
 
         //Draw a triangle
         drawTriangle: function(){
@@ -269,12 +260,23 @@ var draw = (function(){
 
         },
 
-        //Draw a rectangle
-        drawRect: function(){
+        //Draw a 3 point triangle with 3 mouse points
+        draw3Point: function(){
+
             ctx.fillStyle = this.getFillColor();
             ctx.strokeStyle = this.getStrokeColor();
-            ctx.fillRect(x1,y1, (x2-x1),(y2-y1));
+
+            ctx.beginPath();
+
+            ctx.moveTo(points[0]['x'],points[0]['y']);
+            ctx.lineTo(points[1]['x'],points[1]['y']);
+            ctx.lineTo(points[2]['x'],points[2]['y']);
+            ctx.lineTo(points[0]['x'],points[0]['y']);
+
+            ctx.stroke();
+            ctx.fill();
         },
+
 
         getCanvas: function(){
             return canvas;
@@ -295,10 +297,16 @@ document.getElementById('btnRect').addEventListener('click',function(){
     draw.setShape('rectangle');
 });
 
+//Draw a line
+document.getElementById('btnLine').addEventListener('click',function(){
+    draw.setShape('line');
+});
+
 //Draw a circle
 document.getElementById('btnCircle').addEventListener('click',function(){
     draw.setShape('circle');
 });
+
 
 //Draw a path
 document.getElementById('btnPath').addEventListener('click',function(){
@@ -310,10 +318,6 @@ document.getElementById('btnTriangle').addEventListener('click',function(){
     draw.setShape('triangle');
 });
 
-//Draw a line
-document.getElementById('btnLine').addEventListener('click',function(){
-    draw.setShape('line');
-});
 
 //Draw a three point triangle
 document.getElementById('btn3Point').addEventListener('click', function(){
